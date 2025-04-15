@@ -1,6 +1,7 @@
 # API Vidraçaria dos Anjos - Documentação
 
 ## Índice
+
 1. [Visão Geral](#1-visão-geral)
 2. [Configuração](#2-configuração)
 3. [Autenticação](#3-autenticação)
@@ -13,6 +14,7 @@
 A API da Vidraçaria dos Anjos é um sistema RESTful desenvolvido com FastAPI para gerenciar vendas, orçamentos e clientes. A API utiliza PostgreSQL como banco de dados e implementa autenticação JWT.
 
 ### Tecnologias Principais
+
 - FastAPI
 - SQLAlchemy (ORM)
 - PostgreSQL
@@ -22,12 +24,13 @@ A API da Vidraçaria dos Anjos é um sistema RESTful desenvolvido com FastAPI pa
 ## 2. Configuração
 
 ### Variáveis de Ambiente (.env)
+
 ```env
 # Configurações do Banco de Dados
-DATABASE_URL=postgresql+asyncpg://user:password@localhost/vidracaria
+DATABASE_URL=postgresql://usuario:senha@localhost:5432/nome_do_banco
 
 # Configurações de Segurança
-SECRET_KEY=sua_chave_secreta_aqui_mude_em_producao
+SECRET_KEY=sua_chave_secreta_aqui
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 
 # Configurações do Servidor
@@ -36,6 +39,7 @@ PORT=8000
 ```
 
 ### Instalação
+
 ```bash
 # Criar ambiente virtual
 python -m venv venv
@@ -53,29 +57,28 @@ uvicorn app.main:app --reload
 A API utiliza autenticação JWT (JSON Web Token). Todas as rotas, exceto login, requerem um token válido.
 
 ### Login
-```http
-POST /auth/login
+
+```bash
+curl -X POST "http://localhost:8000/auth/login" \
+     -H "Content-Type: application/json" \
+     -d '{"email": "seu_email@exemplo.com", "senha": "sua_senha"}'
 ```
 
-**Request:**
+Resposta:
+
 ```json
 {
-    "email": "vendedor@email.com",
-    "senha": "senha123"
+  "access_token": "seu_token_jwt",
+  "token_type": "bearer"
 }
 ```
 
-**Response:**
-```json
-{
-    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-    "token_type": "bearer",
-    "vendedor": {
-        "id": "uuid",
-        "nome": "Nome do Vendedor",
-        "email": "vendedor@email.com"
-    }
-}
+### Uso do Token
+
+Inclua o token no header de todas as requisições:
+
+```
+Authorization: Bearer seu_token_jwt
 ```
 
 ## 4. Endpoints
@@ -83,34 +86,33 @@ POST /auth/login
 ### 4.1 Clientes
 
 #### Criar Cliente
-```http
-POST /clientes
-```
-**Request:**
-```json
-{
-    "nome": "João Silva",
-    "cpf": "123.456.789-00",
-    "telefone": "(11) 98765-4321",
-    "endereco": "Rua Example",
-    "numero": "123",
-    "bairro": "Centro",
-    "cidade": "São Paulo",
-    "cep": "01234-567"
-}
+
+```bash
+curl -X POST "http://localhost:8000/clientes/" \
+     -H "Authorization: Bearer seu_token_jwt" \
+     -H "Content-Type: application/json" \
+     -d '{
+         "nome": "Nome do Cliente",
+         "email": "cliente@exemplo.com",
+         "telefone": "1234567890"
+     }'
 ```
 
 #### Listar Clientes
-```http
-GET /clientes?skip=0&limit=100&search=João
+
+```bash
+curl -X GET "http://localhost:8000/clientes/" \
+     -H "Authorization: Bearer seu_token_jwt"
 ```
 
 #### Obter Cliente
+
 ```http
 GET /clientes/{cliente_id}
 ```
 
 #### Atualizar Cliente
+
 ```http
 PATCH /clientes/{cliente_id}
 ```
@@ -118,30 +120,33 @@ PATCH /clientes/{cliente_id}
 ### 4.2 Vendedores
 
 #### Criar Vendedor
-```http
-POST /vendedores
-```
-**Request:**
-```json
-{
-    "nome": "Maria Oliveira",
-    "email": "maria@email.com",
-    "telefone": "(11) 98765-4321",
-    "senha": "senha123"
-}
+
+```bash
+curl -X POST "http://localhost:8000/vendedores/" \
+     -H "Authorization: Bearer seu_token_jwt" \
+     -H "Content-Type: application/json" \
+     -d '{
+         "nome": "Nome do Vendedor",
+         "email": "vendedor@exemplo.com",
+         "senha": "senha_segura"
+     }'
 ```
 
 #### Listar Vendedores
-```http
-GET /vendedores?skip=0&limit=100
+
+```bash
+curl -X GET "http://localhost:8000/vendedores/" \
+     -H "Authorization: Bearer seu_token_jwt"
 ```
 
 #### Obter Vendedor
+
 ```http
 GET /vendedores/{vendedor_id}
 ```
 
 #### Atualizar Vendedor
+
 ```http
 PATCH /vendedores/{vendedor_id}
 ```
@@ -149,54 +154,56 @@ PATCH /vendedores/{vendedor_id}
 ### 4.3 Vendas
 
 #### Criar Venda/Orçamento
-```http
-POST /vendas
-```
-**Request:**
-```json
-{
-    "tipo": "BUDGET",
-    "cliente_id": "uuid",
-    "vendedor_id": "uuid",
-    "total": 1500.00,
-    "itens": [
-        {
-            "quantidade": 2,
-            "material": "Vidro Temperado",
-            "medidas": "1.00x1.50",
-            "cor": "Incolor",
-            "espessura": "8mm",
-            "unitario": 500.00,
-            "subtotal": 1000.00
-        }
-    ]
-}
+
+```bash
+curl -X POST "http://localhost:8000/vendas/" \
+     -H "Authorization: Bearer seu_token_jwt" \
+     -H "Content-Type: application/json" \
+     -d '{
+         "cliente_id": "uuid_do_cliente",
+         "vendedor_id": "uuid_do_vendedor",
+         "valor_total": 1000.00,
+         "itens": [
+             {
+                 "produto": "Nome do Produto",
+                 "quantidade": 2,
+                 "valor_unitario": 500.00
+             }
+         ]
+     }'
 ```
 
 #### Listar Vendas
-```http
-GET /vendas?skip=0&limit=100&tipo=BUDGET&status=PENDING
+
+```bash
+curl -X GET "http://localhost:8000/vendas/" \
+     -H "Authorization: Bearer seu_token_jwt"
 ```
 
 #### Obter Venda
+
 ```http
 GET /vendas/{venda_id}
 ```
 
 #### Atualizar Status
+
 ```http
 PATCH /vendas/{venda_id}/status
 ```
+
 **Request:**
+
 ```json
 {
-    "status": "APPROVED"
+  "status": "APPROVED"
 }
 ```
 
 ## 5. Modelos de Dados
 
 ### 5.1 Cliente
+
 - id: UUID
 - nome: string
 - cpf: string (único)
@@ -210,6 +217,7 @@ PATCH /vendas/{venda_id}/status
 - updated_at: datetime
 
 ### 5.2 Vendedor
+
 - id: UUID
 - nome: string
 - email: string (único)
@@ -220,6 +228,7 @@ PATCH /vendas/{venda_id}/status
 - updated_at: datetime
 
 ### 5.3 Venda
+
 - id: UUID
 - numero_documento: string (único)
 - tipo: string (BUDGET|ORDER)
@@ -231,6 +240,7 @@ PATCH /vendas/{venda_id}/status
 - updated_at: datetime
 
 ### 5.4 Item
+
 - id: UUID
 - venda_id: UUID
 - quantidade: integer
@@ -245,6 +255,7 @@ PATCH /vendas/{venda_id}/status
 ## 6. Exemplos de Uso
 
 ### 6.1 Fluxo Básico
+
 1. Login do vendedor
 2. Cadastro do cliente
 3. Criação do orçamento
@@ -254,54 +265,49 @@ PATCH /vendas/{venda_id}/status
 ### 6.2 Curl Examples
 
 **Login:**
+
 ```bash
 curl -X POST "http://localhost:8000/auth/login" \
      -H "Content-Type: application/json" \
-     -d '{"email": "vendedor@email.com", "senha": "senha123"}'
+     -d '{"email": "seu_email@exemplo.com", "senha": "sua_senha"}'
 ```
 
 **Criar Cliente:**
+
 ```bash
-curl -X POST "http://localhost:8000/clientes" \
-     -H "Authorization: Bearer {seu_token}" \
+curl -X POST "http://localhost:8000/clientes/" \
+     -H "Authorization: Bearer seu_token_jwt" \
      -H "Content-Type: application/json" \
      -d '{
-         "nome": "João Silva",
-         "cpf": "123.456.789-00",
-         "telefone": "(11) 98765-4321",
-         "endereco": "Rua Example",
-         "numero": "123",
-         "bairro": "Centro",
-         "cidade": "São Paulo",
-         "cep": "01234-567"
+         "nome": "Nome do Cliente",
+         "email": "cliente@exemplo.com",
+         "telefone": "1234567890"
      }'
 ```
 
 **Criar Orçamento:**
+
 ```bash
-curl -X POST "http://localhost:8000/vendas" \
-     -H "Authorization: Bearer {seu_token}" \
+curl -X POST "http://localhost:8000/vendas/" \
+     -H "Authorization: Bearer seu_token_jwt" \
      -H "Content-Type: application/json" \
      -d '{
-         "tipo": "BUDGET",
-         "cliente_id": "uuid",
-         "vendedor_id": "uuid",
-         "total": 1500.00,
+         "cliente_id": "uuid_do_cliente",
+         "vendedor_id": "uuid_do_vendedor",
+         "valor_total": 1000.00,
          "itens": [
              {
+                 "produto": "Nome do Produto",
                  "quantidade": 2,
-                 "material": "Vidro Temperado",
-                 "medidas": "1.00x1.50",
-                 "cor": "Incolor",
-                 "espessura": "8mm",
-                 "unitario": 500.00,
-                 "subtotal": 1000.00
+                 "valor_unitario": 500.00
              }
          ]
      }'
 ```
 
 ### 6.3 Documentação Interativa
+
 A API possui documentação interativa disponível em:
+
 - Swagger UI: `/docs`
-- ReDoc: `/redoc` 
+- ReDoc: `/redoc`
