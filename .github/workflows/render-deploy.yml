@@ -7,6 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - uses: actions/checkout@v2
 
@@ -23,6 +24,8 @@ jobs:
       - name: Deploy to Render
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
         run: |
           curl -X POST "https://api.render.com/v1/services" \
                -H "Authorization: Bearer $RENDER_API_KEY" \
@@ -32,7 +35,10 @@ jobs:
                  "type": "web",
                  "env": {
                    "DATABASE_URL": "${{ secrets.DATABASE_URL }}",
-                   "SECRET_KEY": "${{ secrets.SECRET_KEY }}",
+                   "JWT_SECRET_KEY": "${{ secrets.JWT_SECRET_KEY }}",
+                   "JWT_ALGORITHM": "HS256",
                    "ACCESS_TOKEN_EXPIRE_MINUTES": "30"
-                 }
+                 },
+                 "buildCommand": "pip install -r requirements.txt",
+                 "startCommand": "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
                }'
