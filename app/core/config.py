@@ -1,7 +1,20 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
+import os
+from dotenv import load_dotenv
+
+# Carrega o arquivo .env apropriado
+is_production = os.getenv("RENDER", "false").lower() == "true"
+env_file = ".env" if is_production else ".env.local"
+load_dotenv(env_file)
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        case_sensitive=True,
+        env_file=env_file,
+        env_file_encoding='utf-8'
+    )
+
     PROJECT_NAME: str = "Vidraçaria dos Anjos"
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api"
@@ -24,9 +37,5 @@ class Settings(BaseSettings):
     SMTP_USERNAME: str = "seu_email@gmail.com"
     SMTP_PASSWORD: str = "sua_senha_de_app"
     EMAIL_FROM: str = "noreply@vidracaria.com"
-    
-    class Config:
-        case_sensitive = True
-        env_file = ".env"
 
 settings = Settings() 

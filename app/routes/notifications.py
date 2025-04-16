@@ -4,7 +4,7 @@ from typing import List
 from app.core.database import get_db
 from app.models.notification import Notification
 from app.schemas.notification import NotificationCreate, NotificationResponse, NotificationUpdate
-from app.core.auth import get_current_user
+from app.core.security import get_current_user
 from app.models.vendedor import Vendedor
 from app.core.errors import NotFoundError
 from app.core.permissions import require_permission

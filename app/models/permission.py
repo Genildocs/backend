@@ -11,6 +11,14 @@ vendedor_permissions = Table(
     Column('permission_id', String(36), ForeignKey('permissions.id'))
 )
 
+# Tabela de associação entre administradores e permissões
+administrador_permissions = Table(
+    'administrador_permissions',
+    Base.metadata,
+    Column('administrador_id', String(36), ForeignKey('administradores.id')),
+    Column('permission_id', String(36), ForeignKey('permissions.id'))
+)
+
 class Permission(Base):
     __tablename__ = "permissions"
 
@@ -22,6 +30,9 @@ class Permission(Base):
 
     # Relacionamento com vendedores
     vendedores = relationship("Vendedor", secondary=vendedor_permissions, back_populates="permissions")
+    
+    # Relacionamento com administradores
+    administradores = relationship("Administrador", secondary=administrador_permissions, back_populates="permissions")
 
     @classmethod
     def create_default_permissions(cls):
@@ -111,5 +122,26 @@ class Permission(Base):
                 name="delete_notifications",
                 description="Excluir notificações",
                 module="notifications"
+            ),
+            # Permissões específicas para administradores
+            cls(
+                name="manage_vendedores",
+                description="Gerenciar vendedores",
+                module="administracao"
+            ),
+            cls(
+                name="manage_administradores",
+                description="Gerenciar administradores",
+                module="administracao"
+            ),
+            cls(
+                name="manage_permissions",
+                description="Gerenciar permissões",
+                module="administracao"
+            ),
+            cls(
+                name="view_audit_logs",
+                description="Visualizar logs de auditoria",
+                module="administracao"
             )
         ] 

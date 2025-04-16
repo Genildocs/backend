@@ -11,7 +11,8 @@ from .vendedor import (
     VendedorUpdate,
     VendedorResponse,
     VendedorList,
-    VendedorAuth
+    VendedorAuth,
+    Vendedor
 )
 from .venda import (
     ItemBase,
@@ -36,6 +37,7 @@ __all__ = [
     "VendedorResponse",
     "VendedorList",
     "VendedorAuth",
+    "Vendedor",
     "ItemBase",
     "ItemCreate",
     "ItemResponse",

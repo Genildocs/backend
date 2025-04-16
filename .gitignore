@@ -43,4 +43,17 @@ logs/
 htmlcov/
 
 # Render
-render.yaml 
+render.yaml
+
+# Environment variables
+.env.local
+.env.*.local
+
+# Test coverage
+.tox/
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/ 

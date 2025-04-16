@@ -1,14 +1,15 @@
-from .cliente import Cliente
 from .vendedor import Vendedor
-from .venda import Venda, Item
-from .notification import Notification
+from .cliente import Cliente
+from .venda import Venda
 from .permission import Permission
+from .notification import Notification
+from .administrador import Administrador
 
 __all__ = [
-    "Cliente",
     "Vendedor",
+    "Cliente",
     "Venda",
-    "Item",
+    "Permission",
     "Notification",
-    "Permission"
+    "Administrador"
 ] 

@@ -4,8 +4,8 @@ from sqlalchemy.orm import relationship
 import uuid
 from app.core.database import Base
 
-class Vendedor(Base):
-    __tablename__ = "vendedores"
+class Administrador(Base):
+    __tablename__ = "administradores"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     nome = Column(String(100), nullable=False)
@@ -17,4 +17,13 @@ class Vendedor(Base):
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
     # Relacionamento com permissões
-    permissions = relationship("Permission", secondary="vendedor_permissions", back_populates="vendedores") 
+    permissions = relationship("Permission", secondary="administrador_permissions", back_populates="administradores")
+
+    def has_permission(self, permission_name: str) -> bool:
+        """Verifica se o administrador tem uma permissão específica"""
+        return any(p.name == permission_name for p in self.permissions)
+
+    def has_module_permission(self, module: str, action: str) -> bool:
+        """Verifica se o administrador tem permissão em um módulo específico"""
+        permission_name = f"{action}_{module}"
+        return self.has_permission(permission_name) 

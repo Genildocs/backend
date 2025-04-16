@@ -43,4 +43,14 @@ class VendedorList(BaseModel):
 
 class VendedorAuth(BaseModel):
     email: EmailStr
-    senha: str 
+    senha: str
+
+
+class Vendedor(VendedorBase):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: UUID
+    senha: str
+    ativo: bool
+    created_at: datetime
+    updated_at: datetime 
