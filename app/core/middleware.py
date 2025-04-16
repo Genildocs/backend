@@ -7,7 +7,10 @@ def setup_middleware(app: FastAPI):
     # Configuração do CORS
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # Em produção, substitua por origens específicas
+        allow_origins=[
+            "http://localhost:5173",
+            "https://sales-pro-ashen.vercel.app"
+        ],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
