@@ -1,4 +1,3 @@
-from typing import Optional
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -31,4 +30,4 @@ class Notification(NotificationBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True 
+        from_attributes = True 

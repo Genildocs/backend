@@ -9,7 +9,8 @@ def setup_middleware(app: FastAPI):
         CORSMiddleware,
         allow_origins=[
             "http://localhost:5173",
-            "https://sales-pro-ashen.vercel.app"
+            "https://sales-pro-ashen.vercel.app",
+            "http://127.0.0.1:8000"
         ],
         allow_credentials=True,
         allow_methods=["*"],
