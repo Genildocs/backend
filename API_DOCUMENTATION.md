@@ -1,313 +1,158 @@
-# API Vidraçaria dos Anjos - Documentação
+# Documentação da API - Vidraçaria dos Anjos
 
-## Índice
+## URL Base
 
-1. [Visão Geral](#1-visão-geral)
-2. [Configuração](#2-configuração)
-3. [Autenticação](#3-autenticação)
-4. [Endpoints](#4-endpoints)
-5. [Modelos de Dados](#5-modelos-de-dados)
-6. [Exemplos de Uso](#6-exemplos-de-uso)
-
-## 1. Visão Geral
-
-A API da Vidraçaria dos Anjos é um sistema RESTful desenvolvido com FastAPI para gerenciar vendas, orçamentos e clientes. A API utiliza PostgreSQL como banco de dados e implementa autenticação JWT.
-
-### Tecnologias Principais
-
-- FastAPI
-- SQLAlchemy (ORM)
-- PostgreSQL
-- JWT (Autenticação)
-- Pydantic (Validação de dados)
-
-## 2. Configuração
-
-### Variáveis de Ambiente (.env)
-
-```env
-# Configurações do Banco de Dados
-DATABASE_URL=postgresql://usuario:senha@localhost:5432/nome_do_banco
-
-# Configurações de Segurança
-SECRET_KEY=sua_chave_secreta_aqui
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# Configurações do Servidor
-HOST=0.0.0.0
-PORT=8000
+```
+https://sales-pro-ashen.vercel.app/api
 ```
 
-### Instalação
+## Endpoints
 
-```bash
-# Criar ambiente virtual
-python -m venv venv
-source venv/bin/activate
+### Autenticação
 
-# Instalar dependências
-pip install -r requirements.txt
+- `POST /auth/register` - Registrar novo vendedor
+- `POST /auth/login` - Login de vendedor
 
-# Iniciar servidor
-uvicorn app.main:app --reload
+### Notificações
+
+- `POST /notifications` - Criar notificação
+- `GET /notifications` - Listar notificações
+- `GET /notifications/unread` - Listar notificações não lidas
+- `PUT /notifications/{id}` - Atualizar notificação
+- `DELETE /notifications/{id}` - Deletar notificação
+
+### Clientes
+
+- `GET /clientes` - Listar clientes
+- `POST /clientes` - Criar cliente
+- `GET /clientes/{id}` - Obter cliente
+- `PUT /clientes/{id}` - Atualizar cliente
+- `DELETE /clientes/{id}` - Deletar cliente
+
+### Vendedores
+
+- `GET /vendedores` - Listar vendedores
+- `POST /vendedores` - Criar vendedor
+- `GET /vendedores/{id}` - Obter vendedor
+- `PUT /vendedores/{id}` - Atualizar vendedor
+- `DELETE /vendedores/{id}` - Deletar vendedor
+
+### Vendas
+
+- `GET /vendas` - Listar vendas
+- `POST /vendas` - Criar venda
+- `GET /vendas/{id}` - Obter venda
+- `PUT /vendas/{id}` - Atualizar venda
+- `DELETE /vendas/{id}` - Deletar venda
+
+### Recuperação de Senha
+
+- `POST /password-reset/request` - Solicitar redefinição de senha
+- `POST /password-reset/reset` - Redefinir senha
+
+## Exemplo de Uso
+
+### Autenticação
+
+```typescript
+// Login
+const login = async (email: string, senha: string) => {
+  const response = await fetch(
+    'https://sales-pro-ashen.vercel.app/api/auth/login',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, senha }),
+    }
+  );
+  return response.json();
+};
+
+// Registrar
+const register = async (vendedorData: {
+  nome: string;
+  email: string;
+  telefone: string;
+  senha: string;
+}) => {
+  const response = await fetch(
+    'https://sales-pro-ashen.vercel.app/api/auth/register',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(vendedorData),
+    }
+  );
+  return response.json();
+};
 ```
 
-## 3. Autenticação
+### Notificações
 
-A API utiliza autenticação JWT (JSON Web Token). Todas as rotas, exceto login, requerem um token válido.
+```typescript
+// Criar notificação
+const createNotification = async (notification: {
+  title: string;
+  message: string;
+  type: string;
+}) => {
+  const response = await fetch(
+    'https://sales-pro-ashen.vercel.app/api/notifications',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(notification),
+    }
+  );
+  return response.json();
+};
 
-### Login
-
-```bash
-curl -X POST "http://localhost:8000/auth/login" \
-     -H "Content-Type: application/json" \
-     -d '{"email": "seu_email@exemplo.com", "senha": "sua_senha"}'
+// Listar notificações
+const getNotifications = async () => {
+  const response = await fetch(
+    'https://sales-pro-ashen.vercel.app/api/notifications',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.json();
+};
 ```
 
-Resposta:
+## Headers Necessários
 
-```json
-{
-  "access_token": "seu_token_jwt",
-  "token_type": "bearer"
+Para endpoints que requerem autenticação, inclua o token JWT no header:
+
+```typescript
+headers: {
+  'Authorization': `Bearer ${token}`,
+  'Content-Type': 'application/json'
 }
 ```
 
-### Uso do Token
+## CORS
 
-Inclua o token no header de todas as requisições:
+A API aceita requisições das seguintes origens:
 
-```
-Authorization: Bearer seu_token_jwt
-```
+- `http://localhost:5173` (desenvolvimento)
+- `https://sales-pro-ashen.vercel.app` (produção)
 
-## 4. Endpoints
+## Status Codes
 
-### 4.1 Clientes
-
-#### Criar Cliente
-
-```bash
-curl -X POST "http://localhost:8000/clientes/" \
-     -H "Authorization: Bearer seu_token_jwt" \
-     -H "Content-Type: application/json" \
-     -d '{
-         "nome": "Nome do Cliente",
-         "email": "cliente@exemplo.com",
-         "telefone": "1234567890"
-     }'
-```
-
-#### Listar Clientes
-
-```bash
-curl -X GET "http://localhost:8000/clientes/" \
-     -H "Authorization: Bearer seu_token_jwt"
-```
-
-#### Obter Cliente
-
-```http
-GET /clientes/{cliente_id}
-```
-
-#### Atualizar Cliente
-
-```http
-PATCH /clientes/{cliente_id}
-```
-
-### 4.2 Vendedores
-
-#### Criar Vendedor
-
-```bash
-curl -X POST "http://localhost:8000/vendedores/" \
-     -H "Authorization: Bearer seu_token_jwt" \
-     -H "Content-Type: application/json" \
-     -d '{
-         "nome": "Nome do Vendedor",
-         "email": "vendedor@exemplo.com",
-         "senha": "senha_segura"
-     }'
-```
-
-#### Listar Vendedores
-
-```bash
-curl -X GET "http://localhost:8000/vendedores/" \
-     -H "Authorization: Bearer seu_token_jwt"
-```
-
-#### Obter Vendedor
-
-```http
-GET /vendedores/{vendedor_id}
-```
-
-#### Atualizar Vendedor
-
-```http
-PATCH /vendedores/{vendedor_id}
-```
-
-### 4.3 Vendas
-
-#### Criar Venda/Orçamento
-
-```bash
-curl -X POST "http://localhost:8000/vendas/" \
-     -H "Authorization: Bearer seu_token_jwt" \
-     -H "Content-Type: application/json" \
-     -d '{
-         "cliente_id": "uuid_do_cliente",
-         "vendedor_id": "uuid_do_vendedor",
-         "valor_total": 1000.00,
-         "itens": [
-             {
-                 "produto": "Nome do Produto",
-                 "quantidade": 2,
-                 "valor_unitario": 500.00
-             }
-         ]
-     }'
-```
-
-#### Listar Vendas
-
-```bash
-curl -X GET "http://localhost:8000/vendas/" \
-     -H "Authorization: Bearer seu_token_jwt"
-```
-
-#### Obter Venda
-
-```http
-GET /vendas/{venda_id}
-```
-
-#### Atualizar Status
-
-```http
-PATCH /vendas/{venda_id}/status
-```
-
-**Request:**
-
-```json
-{
-  "status": "APPROVED"
-}
-```
-
-## 5. Modelos de Dados
-
-### 5.1 Cliente
-
-- id: UUID
-- nome: string
-- cpf: string (único)
-- telefone: string
-- endereco: string
-- numero: string
-- bairro: string
-- cidade: string
-- cep: string
-- created_at: datetime
-- updated_at: datetime
-
-### 5.2 Vendedor
-
-- id: UUID
-- nome: string
-- email: string (único)
-- telefone: string
-- senha: string (hash)
-- ativo: boolean
-- created_at: datetime
-- updated_at: datetime
-
-### 5.3 Venda
-
-- id: UUID
-- numero_documento: string (único)
-- tipo: string (BUDGET|ORDER)
-- status: string (PENDING|APPROVED|REJECTED|CANCELLED)
-- cliente_id: UUID
-- vendedor_id: UUID
-- total: decimal
-- created_at: datetime
-- updated_at: datetime
-
-### 5.4 Item
-
-- id: UUID
-- venda_id: UUID
-- quantidade: integer
-- material: string
-- medidas: string
-- cor: string
-- espessura: string
-- unitario: decimal
-- subtotal: decimal
-- created_at: datetime
-
-## 6. Exemplos de Uso
-
-### 6.1 Fluxo Básico
-
-1. Login do vendedor
-2. Cadastro do cliente
-3. Criação do orçamento
-4. Aprovação do orçamento
-5. Conversão em venda
-
-### 6.2 Curl Examples
-
-**Login:**
-
-```bash
-curl -X POST "http://localhost:8000/auth/login" \
-     -H "Content-Type: application/json" \
-     -d '{"email": "seu_email@exemplo.com", "senha": "sua_senha"}'
-```
-
-**Criar Cliente:**
-
-```bash
-curl -X POST "http://localhost:8000/clientes/" \
-     -H "Authorization: Bearer seu_token_jwt" \
-     -H "Content-Type: application/json" \
-     -d '{
-         "nome": "Nome do Cliente",
-         "email": "cliente@exemplo.com",
-         "telefone": "1234567890"
-     }'
-```
-
-**Criar Orçamento:**
-
-```bash
-curl -X POST "http://localhost:8000/vendas/" \
-     -H "Authorization: Bearer seu_token_jwt" \
-     -H "Content-Type: application/json" \
-     -d '{
-         "cliente_id": "uuid_do_cliente",
-         "vendedor_id": "uuid_do_vendedor",
-         "valor_total": 1000.00,
-         "itens": [
-             {
-                 "produto": "Nome do Produto",
-                 "quantidade": 2,
-                 "valor_unitario": 500.00
-             }
-         ]
-     }'
-```
-
-### 6.3 Documentação Interativa
-
-A API possui documentação interativa disponível em:
-
-- Swagger UI: `/docs`
-- ReDoc: `/redoc`
+- 200: Sucesso
+- 201: Criado com sucesso
+- 400: Requisição inválida
+- 401: Não autorizado
+- 403: Acesso negado
+- 404: Recurso não encontrado
+- 422: Dados inválidos
+- 500: Erro interno do servidor
